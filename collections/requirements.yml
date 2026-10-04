@@ -1,9 +1,6 @@
 ---
 collections:
-  # software_update (Command Line Tools), homebrew_packages and android_sdk
-  # are the same roles that provision the Nomad runners, so this Mac and CI
-  # get their toolchains the same way.
-  - name: cosmonautical.nomadintosh
-    version: 5.0.1
   - name: geerlingguy.mac
   - name: community.general
+  - name: cosmonautical.notify
+    version: "0.0.1"

@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.2.0] - 2026-10-04
+
+Nomadintosh's general-purpose macOS roles now live here, so workstations and the Nomad cluster share one copy. Nomadintosh 6.0.0 uses them from this collection.
+
+### Added
+
+- Moved from Nomadintosh 5.0.1, unchanged apart from what's listed under Changed: `software_update`, `homebrew_packages`, `homebrew_trust`, `release_archives`, `android_sdk`, `docker_desktop`, `podman`, `container`, `nfs_mounts`, `clean` and `reboot`. Their variables keep the same names (`additional_homebrew_packages__*`, `release_archives__*`, `podman.enabled`, `nfs_mounts_shares`, `nas_host`, ...), so existing inventories keep working.
+- New dependency on `cosmonautical.notify`, for `software_update`'s optional Discord notification.
+- `playbooks/group_vars/all.yml` sets `log_dir`, `config_dir`, `launch_agents_dir` and `launch_daemons_dir`, which the LaunchAgent and LaunchDaemon roles expect.
+
+### Changed
+
+- `homebrew_packages_base_taps` now defaults to `[]`. In Nomadintosh it defaulted to `[hashicorp/tap]`, which only Consul and Nomad need, and Nomadintosh now sets that itself.
+- `playbooks/main.yml` uses this collection's own roles, so `collections/requirements.yml` no longer pulls in `cosmonautical.nomadintosh`.
+- Role READMEs point to Nomadintosh's `nomad` role by URL where they mention its Podman, Container and Docker driver wiring.
+- Removed `importer_result.json`, a local `galaxy-importer` output that was committed by mistake and shipped in 0.1.0. It's now gitignored and in `build_ignore`.
+- The NFS watchdog script's header comment now names `cosmonautical.macible`. Only the script changes; the LaunchDaemon isn't reloaded.
+
 ## [0.1.0] - 2026-10-04
 
 First release on Ansible Galaxy, as the `cosmonautical.macible` collection. Macible is the generic macOS layer: roles that apply to any Apple silicon Mac, whether it's a workstation or a Nomad client. [Nomadintosh](https://github.com/Cosmonautical-Cloud/Nomadintosh) builds on it to provision its cluster.
