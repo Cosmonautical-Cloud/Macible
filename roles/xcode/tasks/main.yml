@@ -1,8 +1,16 @@
 ---
+# In check mode the homebrew role only reports mas as installed, so on a Mac
+# without it the App Store step is skipped instead of failing.
+- name: Check for mas
+  ansible.builtin.stat:
+    path: "{{ homebrew_dir }}/bin/mas"
+  register: xcode_mas
+
 # Installs mas and every app in mas_installed_apps, Xcode among them.
 - name: Install App Store apps
   ansible.builtin.include_role:
     name: geerlingguy.mac.mas
+  when: not ansible_check_mode or xcode_mas.stat.exists
 
 - name: Check Xcode is installed
   ansible.builtin.stat:
@@ -17,92 +25,8 @@
       mas_installed_apps and that you're signed in to the App Store on this
       Mac - mas can't sign in on its own.
     quiet: true
+  when: not ansible_check_mode
 
-# The Command Line Tools are selected after they're installed, and
-# xcodebuild only works against a full Xcode.
-- name: Read the selected developer directory
-  ansible.builtin.command:
-    argv:
-      - xcode-select
-      - --print-path
-  register: xcode_select_path
-  changed_when: false
-  failed_when: false
-  check_mode: false
-
-- name: Select Xcode
-  become: true
-  ansible.builtin.command:
-    argv:
-      - xcode-select
-      - --switch
-      - "{{ xcode_app }}/Contents/Developer"
-  when: xcode_select_path.stdout != xcode_app ~ '/Contents/Developer'
-  changed_when: true
-
-- name: Check the Xcode license is accepted
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -license
-      - check
-  register: xcode_license
-  changed_when: false
-  failed_when: false
-  check_mode: false
-
-- name: Accept the Xcode license
-  become: true
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -license
-      - accept
-  when: xcode_license.rc != 0
-  changed_when: true
-
-# Installs the system packages Xcode otherwise asks for the first time it
-# opens.
-- name: Check Xcode's first launch has run
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -checkFirstLaunchStatus
-  register: xcode_first_launch
-  changed_when: false
-  failed_when: false
-  check_mode: false
-
-- name: Run Xcode's first launch
-  become: true
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -runFirstLaunch
-  when: xcode_first_launch.rc != 0
-  changed_when: true
-
-- name: List simulator runtimes
-  ansible.builtin.command:
-    argv:
-      - xcrun
-      - simctl
-      - list
-      - runtimes
-      - --json
-  register: xcode_runtimes
-  changed_when: false
-  check_mode: false
-
-- name: Download missing simulator runtimes
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -downloadPlatform
-      - "{{ item }}"
-  loop: "{{ xcode_simulator_platforms }}"
-  when: >-
-    (xcode_runtimes.stdout | from_json).runtimes
-    | selectattr('platform', 'equalto', item)
-    | list | length == 0
-  changed_when: true
+- name: Configure Xcode
+  ansible.builtin.include_tasks: configure.yml
+  when: xcode_app_stat.stat.exists
