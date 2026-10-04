@@ -1,10 +1,14 @@
+---
 namespace: cosmonautical
 name: macible
 authors:
   - Violet Caulfield
 version: 0.1.0
 readme: README.md
-description: Generic macOS roles shared by Apple silicon workstations and servers (Xcode and simulator runtimes, Ruby, the shell environment), plus a playbook that sets up a Mac for development.
+description: >-
+  Generic macOS roles shared by Apple silicon workstations and servers (Xcode
+  and simulator runtimes, Ruby, the shell environment), plus a playbook that
+  sets up a Mac for development.
 license:
   - GPL-3.0-only
 tags:
