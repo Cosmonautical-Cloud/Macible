@@ -17,7 +17,7 @@
     # Command Line Tools, which Homebrew needs.
     - name: Perform Software Update
       ansible.builtin.include_role:
-        name: cosmonautical.nomadintosh.software_update
+        name: software_update
         apply:
           tags:
             - software_update
@@ -26,7 +26,7 @@
 
     - name: Install Homebrew and packages
       ansible.builtin.include_role:
-        name: cosmonautical.nomadintosh.homebrew_packages
+        name: homebrew_packages
         apply:
           tags:
             - homebrew
@@ -53,7 +53,7 @@
 
     - name: Install the JDK and Android SDK
       ansible.builtin.include_role:
-        name: cosmonautical.nomadintosh.android_sdk
+        name: android_sdk
         apply:
           tags:
             - android_sdk

@@ -3,7 +3,7 @@ namespace: cosmonautical
 name: macible
 authors:
   - Violet Caulfield
-version: 0.1.0
+version: 0.2.0
 readme: README.md
 description: >-
   Generic macOS roles shared by Apple silicon workstations and servers (Xcode
@@ -21,16 +21,18 @@ tags:
 repository: https://github.com/Cosmonautical-Cloud/Macible
 homepage: https://github.com/Cosmonautical-Cloud/Macible
 issues: https://github.com/Cosmonautical-Cloud/Macible/issues
-# Only what the roles themselves need. Macible is the generic layer that
-# Nomadintosh builds on, so cosmonautical.nomadintosh depends on this
-# collection, never the other way round. playbooks/main.yml still borrows a
-# few of Nomadintosh's roles until they move here; that's listed in
-# collections/requirements.yml, not here, to keep the dependency one-way.
+# Macible is the generic layer that Nomadintosh builds on, so
+# cosmonautical.nomadintosh depends on this collection, never the other way
+# round.
 dependencies:
   geerlingguy.mac: "*"
   community.general: "*"
+  # software_update's optional Discord notification.
+  cosmonautical.notify: ">=0.0.1"
 # Never ship a local inventory (it can hold credentials) or the local
 # collection cache.
 build_ignore:
   - .ansible
   - inventory/hosts.yml
+  # Written by galaxy-importer when it's run locally.
+  - importer_result.json

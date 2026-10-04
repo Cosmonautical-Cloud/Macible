@@ -1,0 +1,4 @@
+---
+# Taps every host gets regardless of inventory (e.g. Nomadintosh adds
+# hashicorp/tap for Consul and Nomad).
+homebrew_packages_base_taps: []

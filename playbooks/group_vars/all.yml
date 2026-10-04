@@ -7,6 +7,13 @@
 # keep them in sync.
 homebrew_dir: /opt/homebrew
 
+# Shared by the roles that write LaunchAgents/LaunchDaemons, scripts and logs
+# (podman, container, nfs_mounts). Nomadintosh sets equivalent values.
+log_dir: "{{ homebrew_dir }}/var/log"
+config_dir: /etc
+launch_agents_dir: "{{ ansible_facts.env.HOME }}/Library/LaunchAgents"
+launch_daemons_dir: /Library/LaunchDaemons
+
 # Keep in sync with packageManager in Jellify-Music/App's package.json.
 # renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$
 macible_bun_version: "1.4.2"
@@ -20,7 +27,7 @@ macible_ruby_version: "4.0.7"
 # Keg-only, so shell_env puts it on PATH ahead of anything else.
 macible_node_formula: node@24
 
-# Entries are a formula name, or {name, exclusive} - see Nomadintosh's
+# Entries are a formula name, or {name, exclusive} - see the
 # homebrew_packages role. Add your own in additional_homebrew_packages__<name>
 # lists (in this file or the inventory); they're all merged.
 additional_homebrew_packages__toolchain:

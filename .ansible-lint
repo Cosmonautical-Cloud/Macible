@@ -4,3 +4,12 @@ profile: moderate
 skip_list:
   # state: latest is intentional - every run keeps the toolchain up to date.
   - package-latest
+  # Public, cross-role inventory variables (notify_enabled,
+  # volume_mount_path, ...) that inventories set directly. The roles came
+  # from Nomadintosh with these names, and prefixing them would break every
+  # existing inventory.
+  - var-naming[no-role-prefix]
+
+warn_list:
+  # softwareupdate --download has no reliable stdout to detect changes.
+  - no-changed-when
