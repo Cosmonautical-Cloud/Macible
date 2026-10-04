@@ -42,11 +42,10 @@ additional_homebrew_packages__toolchain:
 homebrew_cask_apps:
   - android-studio
 
-# The App Store build of Xcode. mas can't sign in on current macOS, so sign
-# in to the App Store on the Mac once before the first run.
-mas_installed_apps:
-  - id: 497799835
-    name: Xcode
+# Extra App Store apps, as {id, name}. The xcode role always installs Xcode
+# itself. mas can't sign in on current macOS, so sign in to the App Store on
+# the Mac once before the first run.
+mas_installed_apps: []
 
 # Matches Jellify-Music/App's android/build.gradle (compileSdk, buildTools,
 # NDK) and the emulator image its Maestro workflow uses.

@@ -1,10 +1,30 @@
 # Macible
 
-An Ansible playbook that sets up an Apple silicon Mac for local development: the toolchain [Jellify](https://github.com/Jellify-Music/App)'s [CONTRIBUTING.md](https://github.com/Jellify-Music/App/blob/main/CONTRIBUTING.md) asks for, installed the same way [Nomadable](https://github.com/Cosmonautical-Cloud/Nomadable) provisions the CI runners.
+Generic macOS roles for Apple silicon Macs, published on Ansible Galaxy as [`cosmonautical.macible`](https://galaxy.ansible.com/ui/repo/published/cosmonautical/macible/). They're meant for any Mac, whether it's a workstation or a server: [Nomadintosh](https://github.com/Cosmonautical-Cloud/Nomadintosh) uses them to provision the Nomad cluster's Macs, and this repository's playbook uses them to set up a Mac for local development.
 
-It reuses [Nomadintosh](https://github.com/Cosmonautical-Cloud/Nomadintosh)'s `software_update`, `homebrew_packages` and `android_sdk` roles, so this Mac and the Nomad runners get Homebrew packages, pinned Bun and the Android SDK from the same code.
+The playbook installs the toolchain [Jellify](https://github.com/Jellify-Music/App)'s [CONTRIBUTING.md](https://github.com/Jellify-Music/App/blob/main/CONTRIBUTING.md) asks for, the same way [Nomadable](https://github.com/Cosmonautical-Cloud/Nomadable) provisions the CI runners. For now it also borrows Nomadintosh's `software_update`, `homebrew_packages` and `android_sdk` roles, so this Mac and the Nomad runners get Homebrew packages, pinned Bun and the Android SDK from the same code.
 
-## What it does
+## Roles
+
+| Role | What it does |
+|---|---|
+| [`cosmonautical.macible.xcode`](roles/xcode/README.md) | Installs Xcode from the App Store, selects it, accepts its license, runs its first-launch setup and downloads simulator runtimes |
+| `cosmonautical.macible.ruby` | Builds Ruby versions with rbenv and sets the rbenv global |
+| `cosmonautical.macible.shell_env` | Manages a block in `~/.zprofile` that puts Homebrew, Node, rbenv, the JDK and the Android SDK on the shell |
+
+To use them in your own playbooks:
+
+```sh
+ansible-galaxy collection install cosmonautical.macible
+```
+
+```yaml
+- name: Install Xcode
+  ansible.builtin.include_role:
+    name: cosmonautical.macible.xcode
+```
+
+## The development playbook
 
 | Tag | Role | What it does |
 |---|---|---|

@@ -3,13 +3,25 @@
 # without it the App Store step is skipped instead of failing.
 - name: Check for mas
   ansible.builtin.stat:
-    path: "{{ homebrew_dir }}/bin/mas"
+    path: "{{ xcode_mas_path }}"
   register: xcode_mas
 
-# Installs mas and every app in mas_installed_apps, Xcode among them.
+# geerlingguy.mac.mas defaults mas_installed_apps to a list of demo apps, so
+# the role always passes its own list: Xcode plus whatever the inventory sets.
+- name: List App Store apps to install
+  ansible.builtin.set_fact:
+    xcode_mas_apps: >-
+      {{
+        ([{'id': xcode_mas_id, 'name': 'Xcode'}]
+         + (mas_installed_apps if mas_installed_apps is defined else []))
+        | unique(attribute='id')
+      }}
+
 - name: Install App Store apps
   ansible.builtin.include_role:
     name: geerlingguy.mac.mas
+  vars:
+    mas_installed_apps: "{{ xcode_mas_apps }}"
   when: not ansible_check_mode or xcode_mas.stat.exists
 
 - name: Check Xcode is installed
@@ -21,9 +33,8 @@
   ansible.builtin.assert:
     that: xcode_app_stat.stat.exists
     fail_msg: >-
-      {{ xcode_app }} doesn't exist. Make sure Xcode (497799835) is in
-      mas_installed_apps and that you're signed in to the App Store on this
-      Mac - mas can't sign in on its own.
+      {{ xcode_app }} doesn't exist. Sign in to the App Store on this Mac
+      (mas can't sign in on its own), then run this again.
     quiet: true
   when: not ansible_check_mode
 
