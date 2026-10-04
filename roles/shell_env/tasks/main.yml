@@ -6,3 +6,7 @@
     mode: '0644'
     marker: "# {mark} MACIBLE MANAGED BLOCK"
     block: "{{ lookup('ansible.builtin.template', 'zprofile.j2') }}"
+
+- name: Set up the environment for apps opened outside a shell
+  ansible.builtin.include_tasks: gui.yml
+  when: shell_env_gui | bool

@@ -1,0 +1,19 @@
+---
+# Apps opened from the Dock, Finder or Spotlight get launchd's environment,
+# not the login shell's, so without this Android Studio's Gradle can't find
+# the keg-only Node ("A problem occurred starting process 'command 'node''").
+# The LaunchAgent sets it at every login.
+- name: Apply the environment Launch Agent
+  ansible.builtin.template:
+    src: LaunchAgents/environment.plist.j2
+    dest: "{{ launch_agents_dir }}/{{ shell_env_gui_label }}.plist"
+    mode: '0644'
+  register: shell_env_gui_plist
+
+# Same command the Launch Agent runs, so this session gets it without a
+# logout. Apps that are already open need restarting to pick it up.
+- name: Set the environment for this login session
+  ansible.builtin.command:
+    argv: "{{ shell_env_gui_setenv_args }}"
+  when: shell_env_gui_plist is changed
+  changed_when: true
