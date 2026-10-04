@@ -1,0 +1,8 @@
+---
+- name: Manage the Macible block in the shell profile
+  ansible.builtin.blockinfile:
+    path: "{{ shell_env_file }}"
+    create: true
+    mode: '0644'
+    marker: "# {mark} MACIBLE MANAGED BLOCK"
+    block: "{{ lookup('ansible.builtin.template', 'zprofile.j2') }}"

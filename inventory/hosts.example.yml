@@ -1,0 +1,10 @@
+---
+# Copy to inventory/hosts.yml (gitignored). Semaphore uses its own static
+# inventory instead - see README.md.
+macbooks:
+  hosts:
+    macbook-pro.local:
+      ansible_user: youruser
+
+# Or run on the Mac itself, with no SSH:
+#   ansible-playbook playbooks/main.yml -i localhost, -c local -K

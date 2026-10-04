@@ -1,0 +1,63 @@
+---
+# Loaded for every play in playbooks/, whatever inventory the run uses, so
+# Semaphore's static inventory only has to list the host and how to reach it.
+#
+# The toolchain below follows Jellify-Music/App's CONTRIBUTING.md and the
+# versions its CI runners use (Nomadable's group_vars/github_runners.yml) -
+# keep them in sync.
+homebrew_dir: /opt/homebrew
+
+# Keep in sync with packageManager in Jellify-Music/App's package.json.
+# renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$
+macible_bun_version: "1.4.2"
+
+# Keep in sync with ios/.ruby-version in Jellify-Music/App. Also set as the
+# rbenv global, so android/ and the repository root (no .ruby-version of
+# their own) get it too.
+# renovate: datasource=ruby-version depName=ruby
+macible_ruby_version: "4.0.7"
+
+# Keg-only, so shell_env puts it on PATH ahead of anything else.
+macible_node_formula: node@24
+
+# Entries are a formula name, or {name, exclusive} - see Nomadintosh's
+# homebrew_packages role. Add your own in additional_homebrew_packages__<name>
+# lists (in this file or the inventory); they're all merged.
+additional_homebrew_packages__toolchain:
+  - git
+  - gh
+  - "{{ macible_node_formula }}"
+  # exclusive removes any other bun formula first (every version links bin/bun).
+  - name: "oven-sh/bun/bun@{{ macible_bun_version }}"
+    exclusive: true
+  - watchman
+  # rbenv builds Ruby from source with ruby-build; these are its build
+  # dependencies.
+  - rbenv
+  - ruby-build
+  - openssl@3
+  - libyaml
+  - gmp
+
+homebrew_cask_apps:
+  - android-studio
+
+# The App Store build of Xcode. mas can't sign in on current macOS, so sign
+# in to the App Store on the Mac once before the first run.
+mas_installed_apps:
+  - id: 497799835
+    name: Xcode
+
+# Matches Jellify-Music/App's android/build.gradle (compileSdk, buildTools,
+# NDK) and the emulator image its Maestro workflow uses.
+android_sdk_root: "{{ ansible_facts.env.HOME }}/Library/Android/sdk"
+# The android_sdk role's default, set here so shell_env can export it too.
+android_sdk_java_home: "{{ homebrew_dir }}/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
+android_sdk_packages:
+  - platform-tools
+  - emulator
+  - platforms;android-36
+  - build-tools;36.0.0
+  - ndk;27.1.12297006
+  - cmake;3.22.1
+  - system-images;android-34;google_apis;arm64-v8a

@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: Violet Caulfield
+  description: Manages a block in ~/.zprofile that puts Homebrew, Node, rbenv, the JDK and the Android SDK on PATH.
+  license: GPL-3.0-only
+  min_ansible_version: "2.15"
+dependencies: []

@@ -1,0 +1,6 @@
+---
+# Login-shell file the environment block is managed in.
+shell_env_file: "{{ ansible_facts.env.HOME }}/.zprofile"
+
+# Extra lines appended to the managed block.
+shell_env_extra_lines: []

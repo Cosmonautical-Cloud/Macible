@@ -1,0 +1,6 @@
+---
+xcode_app: /Applications/Xcode.app
+
+# Simulator runtimes to download if Xcode has none for that platform yet.
+xcode_simulator_platforms:
+  - iOS

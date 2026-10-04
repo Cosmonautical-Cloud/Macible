@@ -1,0 +1,13 @@
+eval "$({{ homebrew_dir }}/bin/brew shellenv)"
+
+# {{ macible_node_formula }} is keg-only.
+export PATH="{{ homebrew_dir }}/opt/{{ macible_node_formula }}/bin:$PATH"
+
+eval "$(rbenv init - zsh)"
+
+export JAVA_HOME="{{ android_sdk_java_home }}"
+export ANDROID_HOME="{{ android_sdk_root }}"
+export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools"
+{% for line in shell_env_extra_lines %}
+{{ line }}
+{% endfor %}

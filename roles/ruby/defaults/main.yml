@@ -1,0 +1,4 @@
+---
+# Built with rbenv (ruby-build). The first is also the rbenv global.
+ruby_versions:
+  - "{{ macible_ruby_version }}"

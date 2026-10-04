@@ -1,0 +1,70 @@
+---
+- name: Set up a Mac for local development
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Assert host is macOS on Apple silicon
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.os_family == 'Darwin'
+          - ansible_facts.machine == 'arm64'
+        fail_msg: Macible only sets up Apple silicon Macs.
+        quiet: true
+      tags:
+        - always
+
+    # Downloads macOS updates (without installing them) and installs the
+    # Command Line Tools, which Homebrew needs.
+    - name: Perform Software Update
+      ansible.builtin.include_role:
+        name: cosmonautical.nomadintosh.software_update
+        apply:
+          tags:
+            - software_update
+      tags:
+        - software_update
+
+    - name: Install Homebrew and packages
+      ansible.builtin.include_role:
+        name: cosmonautical.nomadintosh.homebrew_packages
+        apply:
+          tags:
+            - homebrew
+      tags:
+        - homebrew
+
+    - name: Install Xcode
+      ansible.builtin.include_role:
+        name: xcode
+        apply:
+          tags:
+            - xcode
+      tags:
+        - xcode
+
+    - name: Install Ruby
+      ansible.builtin.include_role:
+        name: ruby
+        apply:
+          tags:
+            - ruby
+      tags:
+        - ruby
+
+    - name: Install the JDK and Android SDK
+      ansible.builtin.include_role:
+        name: cosmonautical.nomadintosh.android_sdk
+        apply:
+          tags:
+            - android_sdk
+      tags:
+        - android_sdk
+
+    - name: Configure the shell
+      ansible.builtin.include_role:
+        name: shell_env
+        apply:
+          tags:
+            - shell_env
+      tags:
+        - shell_env

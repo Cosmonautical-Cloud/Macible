@@ -1,0 +1,35 @@
+---
+# Projects pick their version from .ruby-version (e.g. Jellify's
+# ios/.ruby-version), and Bundler ships with Ruby, so no gems are installed
+# globally.
+- name: Build Ruby versions
+  ansible.builtin.command:
+    argv:
+      - "{{ homebrew_dir }}/bin/rbenv"
+      - install
+      - --skip-existing
+      - "{{ item }}"
+    creates: "{{ ansible_facts.env.HOME }}/.rbenv/versions/{{ item }}"
+  environment:
+    PATH: "{{ homebrew_dir }}/bin:{{ ansible_facts.env.PATH }}"
+    RUBY_CONFIGURE_OPTS: "--with-openssl-dir={{ homebrew_dir }}/opt/openssl@3 --with-libyaml-dir={{ homebrew_dir }}/opt/libyaml"
+  loop: "{{ ruby_versions }}"
+
+- name: Read the rbenv global
+  ansible.builtin.command:
+    argv:
+      - "{{ homebrew_dir }}/bin/rbenv"
+      - global
+  register: ruby_global
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Set the rbenv global
+  ansible.builtin.command:
+    argv:
+      - "{{ homebrew_dir }}/bin/rbenv"
+      - global
+      - "{{ ruby_versions | first }}"
+  when: ruby_global.stdout != ruby_versions | first
+  changed_when: true

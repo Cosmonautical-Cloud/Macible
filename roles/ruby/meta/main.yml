@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: Violet Caulfield
+  description: Builds Ruby versions with rbenv and sets the rbenv global.
+  license: GPL-3.0-only
+  min_ansible_version: "2.15"
+dependencies: []
