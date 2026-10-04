@@ -1,0 +1,3 @@
+---
+xcode_developer_dir: "{{ xcode_app }}/Contents/Developer"
+xcode_xcodebuild: "{{ xcode_developer_dir }}/usr/bin/xcodebuild"
