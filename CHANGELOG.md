@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.3.0] - 2026-10-04
+
+### Added
+
+- `shell_env` also sets the toolchain environment for apps opened from the Dock, Finder or Spotlight. They get launchd's environment rather than the login shell's, so Android Studio's Gradle sync couldn't find the keg-only Node (`A problem occurred starting process 'command 'node''`). A Launch Agent, `cloud.cosmonautical.macible.environment`, now runs `launchctl setenv` at every login for `PATH`, `JAVA_HOME`, `ANDROID_HOME`, `LANG=en_US.UTF-8` and any `shell_env_gui_extra_vars`. The role also applies it right away when it changes. Turn it off with `shell_env_gui: false`. See [`roles/shell_env/README.md`](roles/shell_env/README.md#apps-opened-outside-a-shell).
+
 ## [0.2.1] - 2026-10-04
 
 ### Fixed

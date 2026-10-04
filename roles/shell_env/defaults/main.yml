@@ -4,3 +4,11 @@ shell_env_file: "{{ ansible_facts.env.HOME }}/.zprofile"
 
 # Extra lines appended to the managed block.
 shell_env_extra_lines: []
+
+# Also give apps opened from the Dock, Finder or Spotlight (Android Studio,
+# Xcode, ...) the toolchain environment. They don't read ~/.zprofile.
+shell_env_gui: true
+
+# Extra variables for those apps, as {NAME: value}. Override the defaults
+# (PATH, JAVA_HOME, ANDROID_HOME, LANG) by setting the same name.
+shell_env_gui_extra_vars: {}

@@ -1,0 +1,30 @@
+---
+shell_env_gui_label: cloud.cosmonautical.macible.environment
+
+shell_env_gui_path:
+  - "{{ homebrew_dir }}/opt/{{ macible_node_formula }}/bin"
+  - "{{ ansible_facts.env.HOME }}/.rbenv/shims"
+  - "{{ homebrew_dir }}/bin"
+  - "{{ homebrew_dir }}/sbin"
+  - /usr/local/bin
+  - /usr/bin
+  - /bin
+  - /usr/sbin
+  - /sbin
+  - "{{ android_sdk_root }}/emulator"
+  - "{{ android_sdk_root }}/platform-tools"
+
+# The same environment the managed block gives login shells.
+shell_env_gui_default_vars:
+  PATH: "{{ shell_env_gui_path | join(':') }}"
+  JAVA_HOME: "{{ android_sdk_java_home }}"
+  ANDROID_HOME: "{{ android_sdk_root }}"
+  LANG: en_US.UTF-8
+
+shell_env_gui_vars: "{{ shell_env_gui_default_vars | combine(shell_env_gui_extra_vars) }}"
+
+# launchctl setenv NAME value [NAME value ...]
+shell_env_gui_setenv_args: >-
+  {{ ['/bin/launchctl', 'setenv']
+     + (shell_env_gui_vars | dict2items | map(attribute='key')
+        | zip(shell_env_gui_vars | dict2items | map(attribute='value')) | flatten) }}
