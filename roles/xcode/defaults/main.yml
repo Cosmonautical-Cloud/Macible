@@ -1,6 +1,14 @@
 ---
 xcode_app: /Applications/Xcode.app
 
+# Xcode's App Store ID. The role always installs it, along with anything in
+# mas_installed_apps.
+xcode_mas_id: 497799835
+
+# Where Homebrew installs mas. Nomadintosh and Macible's playbooks set
+# homebrew_dir; this default covers a bare include of the role.
+xcode_mas_path: "{{ homebrew_dir | default('/opt/homebrew') }}/bin/mas"
+
 # Simulator runtimes to download if Xcode has none for that platform yet.
 xcode_simulator_platforms:
   - iOS
