@@ -1,4 +1,60 @@
 ---
+# The license and first-launch setup run against xcode_app directly, before
+# it's selected. Once xcode-select points at an Xcode whose license isn't
+# accepted, the /usr/bin developer tool shims stop at the license prompt -
+# including /usr/bin/python3, which Ansible runs every module with - so a run
+# interrupted between selecting Xcode and accepting its license would leave
+# every later Ansible run on that host hanging at fact gathering.
+- name: Check the Xcode license is accepted
+  ansible.builtin.command:
+    argv:
+      - "{{ xcode_xcodebuild }}"
+      - -license
+      - check
+  environment:
+    DEVELOPER_DIR: "{{ xcode_developer_dir }}"
+  register: xcode_license
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Accept the Xcode license
+  become: true
+  ansible.builtin.command:
+    argv:
+      - "{{ xcode_xcodebuild }}"
+      - -license
+      - accept
+  environment:
+    DEVELOPER_DIR: "{{ xcode_developer_dir }}"
+  when: xcode_license.rc != 0
+  changed_when: true
+
+# Installs the system packages Xcode otherwise asks for the first time it
+# opens.
+- name: Check Xcode's first launch has run
+  ansible.builtin.command:
+    argv:
+      - "{{ xcode_xcodebuild }}"
+      - -checkFirstLaunchStatus
+  environment:
+    DEVELOPER_DIR: "{{ xcode_developer_dir }}"
+  register: xcode_first_launch
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Run Xcode's first launch
+  become: true
+  ansible.builtin.command:
+    argv:
+      - "{{ xcode_xcodebuild }}"
+      - -runFirstLaunch
+  environment:
+    DEVELOPER_DIR: "{{ xcode_developer_dir }}"
+  when: xcode_first_launch.rc != 0
+  changed_when: true
+
 # The Command Line Tools are selected after they're installed, and
 # xcodebuild only works against a full Xcode.
 - name: Read the selected developer directory
@@ -17,50 +73,8 @@
     argv:
       - xcode-select
       - --switch
-      - "{{ xcode_app }}/Contents/Developer"
-  when: xcode_select_path.stdout != xcode_app ~ '/Contents/Developer'
-  changed_when: true
-
-- name: Check the Xcode license is accepted
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -license
-      - check
-  register: xcode_license
-  changed_when: false
-  failed_when: false
-  check_mode: false
-
-- name: Accept the Xcode license
-  become: true
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -license
-      - accept
-  when: xcode_license.rc != 0
-  changed_when: true
-
-# Installs the system packages Xcode otherwise asks for the first time it
-# opens.
-- name: Check Xcode's first launch has run
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -checkFirstLaunchStatus
-  register: xcode_first_launch
-  changed_when: false
-  failed_when: false
-  check_mode: false
-
-- name: Run Xcode's first launch
-  become: true
-  ansible.builtin.command:
-    argv:
-      - xcodebuild
-      - -runFirstLaunch
-  when: xcode_first_launch.rc != 0
+      - "{{ xcode_developer_dir }}"
+  when: xcode_select_path.stdout != xcode_developer_dir
   changed_when: true
 
 - name: List simulator runtimes

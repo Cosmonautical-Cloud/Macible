@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.2.1] - 2026-10-04
+
+### Fixed
+
+- `xcode` no longer leaves a host where every Ansible run hangs. It used to select Xcode with `xcode-select` before accepting its license, and once an Xcode with an unaccepted license is selected, `/usr/bin/python3` (which Ansible runs every module with) stops at the license prompt. So the very next task hung, and so did every later run, at fact gathering. The license and first-launch setup now run first, against `xcode_app`'s own `xcodebuild`, and Xcode is selected after. Hosts already stuck this way need the license accepted by hand once; see [`roles/xcode/README.md`](roles/xcode/README.md#notes).
+
 ## [0.2.0] - 2026-10-04
 
 Nomadintosh's general-purpose macOS roles now live here, so workstations and the Nomad cluster share one copy. Nomadintosh 6.0.0 uses them from this collection.
