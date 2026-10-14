@@ -50,6 +50,14 @@
   ansible.builtin.include_tasks: exclusive.yml
   when: homebrew_packages_resolved | selectattr('exclusive', 'defined') | selectattr('exclusive') | length > 0
 
+# Some casks (e.g. temurin) ship a signed .pkg that Homebrew installs by
+# shelling out to a bare `sudo ... /usr/sbin/installer` itself, bypassing
+# become/--ask-become-pass entirely - without this, that call hangs forever
+# waiting on a password nothing supplies.
+- name: Allow passwordless sudo for /usr/sbin/installer
+  ansible.builtin.include_role:
+    name: homebrew_installer_sudoers
+
 - name: Install Homebrew, taps, and packages
   ansible.builtin.include_role:
     name: geerlingguy.mac.homebrew

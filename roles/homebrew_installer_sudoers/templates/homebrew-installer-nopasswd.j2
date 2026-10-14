@@ -1,0 +1,8 @@
+## {{ ansible_managed }}
+## Homebrew refuses to run itself as root, so casks that ship a signed .pkg
+## (e.g. temurin) shell out to a bare `sudo ... /usr/sbin/installer` from
+## inside brew itself. That call bypasses Ansible's become/--ask-become-pass
+## entirely and otherwise hangs forever waiting on a password nothing
+## supplies. Scoped to the one binary that actually needs it - not a general
+## NOPASSWD grant.
+{{ homebrew_installer_sudoers_user }} ALL=(root) NOPASSWD: /usr/sbin/installer

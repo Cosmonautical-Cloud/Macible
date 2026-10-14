@@ -1,0 +1,4 @@
+---
+# User the NOPASSWD rule is granted to. Defaults to the user Ansible actually
+# connects/becomes as on the target host.
+homebrew_installer_sudoers_user: "{{ ansible_user_id }}"
