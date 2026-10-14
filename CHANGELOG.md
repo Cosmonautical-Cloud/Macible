@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.4.0] - 2026-10-13
+
+### Added
+
+- New `homebrew_installer_sudoers` role, now run by `homebrew_packages` before installing packages. Some Homebrew casks (e.g. `temurin`) ship a signed `.pkg` and Homebrew shells out to a bare `sudo ... /usr/sbin/installer` itself rather than going through Ansible's `become`, so `--ask-become-pass` never supplies the password it's waiting on and the install hangs forever. The new role deploys a `/etc/sudoers.d/` drop-in (validated with `visudo -cf %s`) granting the connecting user NOPASSWD access to that one binary only. See [`roles/homebrew_installer_sudoers/README.md`](roles/homebrew_installer_sudoers/README.md).
+
 ## [0.3.0] - 2026-10-04
 
 ### Added

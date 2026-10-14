@@ -8,7 +8,8 @@ Resolves the inventory's Homebrew lists, trusts the taps they need, clears confl
 2. **Resolves taps.** A fully qualified package (`user/tap/formula`) implies its tap — listing a tap's formula is the decision to use it — so it's added to the tap list without being listed separately. `homebrew/*` taps are skipped (official, always trusted, and tapping `homebrew/core` would clone it in full).
 3. **Trusts** every resolved tap via the `homebrew_trust` role. Homebrew 7+ won't load formulae from untrusted third-party taps.
 4. **Removes conflicting versions** for `exclusive` entries: every other version of that formula — the unversioned one from `homebrew/core` or its own tap, and any other `@version` — is uninstalled first. Needed for versioned formulae that all link the same binary (`oven-sh/bun/bun@<version>` → `bin/bun`), where a leftover version makes the new one fail to link after a version bump. Opt-in, because keg-only versions (`openjdk@17` next to `openjdk@21`) coexist fine.
-5. Runs `geerlingguy.mac.homebrew` with `homebrew_packages_base_taps` plus the resolved taps and the package names.
+5. **Allows passwordless `sudo` for `/usr/sbin/installer`** via the `homebrew_installer_sudoers` role. Casks that ship a signed `.pkg` (e.g. `temurin`) have Homebrew shell out to a bare `sudo` itself, bypassing `become`/`--ask-become-pass` and hanging forever otherwise.
+6. Runs `geerlingguy.mac.homebrew` with `homebrew_packages_base_taps` plus the resolved taps and the package names.
 
 ## Variables
 

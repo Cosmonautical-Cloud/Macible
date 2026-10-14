@@ -3,7 +3,7 @@ namespace: cosmonautical
 name: macible
 authors:
   - Violet Caulfield
-version: 0.3.0
+version: 0.4.0
 readme: README.md
 description: >-
   Generic macOS roles shared by Apple silicon workstations and servers (Xcode

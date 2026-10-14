@@ -1,0 +1,10 @@
+---
+- name: Deploy NOPASSWD sudoers rule for /usr/sbin/installer
+  ansible.builtin.template:
+    src: homebrew-installer-nopasswd.j2
+    dest: /etc/sudoers.d/homebrew-installer-nopasswd
+    owner: root
+    group: wheel
+    mode: "0440"
+    validate: "visudo -cf %s"
+  become: true

@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: Violet Caulfield
+  description: Grants the connecting user NOPASSWD sudo for /usr/sbin/installer, so pkg-based Homebrew casks can install non-interactively.
+  license: GPL-3.0-only
+  min_ansible_version: "2.15"
+dependencies: []
