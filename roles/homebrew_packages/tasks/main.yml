@@ -44,7 +44,7 @@
   ansible.builtin.include_role:
     name: homebrew_trust
   vars:
-    homebrew_trust_taps: "{{ homebrew_packages_resolved_taps }}"
+    homebrew_trust_taps: "{{ (homebrew_packages_base_taps + homebrew_packages_resolved_taps) | unique }}"
 
 - name: Include exclusive-formula tasks
   ansible.builtin.include_tasks: exclusive.yml
