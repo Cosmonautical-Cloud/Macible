@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.4.1] - 2026-11-17
+
+### Fixed
+
+- Pkg-based casks such as `temurin` failed with `sudo: sorry, you are not allowed to preserve the environment`. Homebrew runs the installer as `sudo -E`, and the `homebrew_installer_sudoers` rule didn't allow `-E`. Since sudo uses the last matching rule, the drop-in also blocked `-E` for admins with a password. The rule is now `NOPASSWD:SETENV:`.
+- `homebrew_packages` now trusts `homebrew_packages_base_taps` (Nomadintosh's `hashicorp/tap`) as well as the resolved taps. Before, base taps were tapped but never trusted, so Homebrew 7 printed the tap-trust warning on every install and `brew upgrade` skipped Consul and Nomad.
+
 ## [0.4.0] - 2026-10-13
 
 ### Added

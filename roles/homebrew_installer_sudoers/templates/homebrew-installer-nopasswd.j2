@@ -4,5 +4,6 @@
 ## inside brew itself. That call bypasses Ansible's become/--ask-become-pass
 ## entirely and otherwise hangs forever waiting on a password nothing
 ## supplies. Scoped to the one binary that actually needs it - not a general
-## NOPASSWD grant.
-{{ homebrew_installer_sudoers_user }} ALL=(root) NOPASSWD: /usr/sbin/installer
+## NOPASSWD grant. SETENV because brew calls it as `sudo -E`; sudo uses the
+## last matching rule, so without it this rule rejects -E outright.
+{{ homebrew_installer_sudoers_user }} ALL=(root) NOPASSWD:SETENV: /usr/sbin/installer
