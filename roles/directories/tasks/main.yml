@@ -1,0 +1,20 @@
+---
+- name: Merge directory lists
+  ansible.builtin.set_fact:
+    directories_merged: >-
+      {{ directories
+         + (query('ansible.builtin.vars', *query('ansible.builtin.varnames', '^directories__.+$') | sort) | flatten) }}
+
+# become, because the parent is often root-owned (/opt) even when the
+# directory itself belongs to the deploy user.
+- name: Create directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(ansible_user) }}"
+    group: "{{ item.group | default('staff') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop: "{{ directories_merged }}"
+  loop_control:
+    label: "{{ item.path }}"

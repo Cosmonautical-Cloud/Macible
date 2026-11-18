@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.6.0] - 2026-11-18
+
+### Added
+
+- `directories` role: creates directories listed in the inventory (`directories`, `directories__<suffix>`). Owner, group and mode default to the deploy user, `staff` and `0755`. It runs with `become`, so it can create a user-owned directory inside root-owned `/opt`, which Nomad, running as that user, can't. Nothing is ever deleted. The GitHub Actions runner's `/opt/github-actions` was created by hand on each runner host; a new one (lovelace) didn't have it, and its runner failed to start with `mkdir: /opt/github-actions: Permission denied`.
+
 ## [0.5.0] - 2026-11-18
 
 ### Added
