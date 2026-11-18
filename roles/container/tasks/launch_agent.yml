@@ -4,6 +4,14 @@
     path: "{{ launch_agents_dir }}/{{ container_launchagent_label }}.plist"
   register: container_launch_agent_stat
 
+- name: Ensure the LaunchAgents directory exists
+  ansible.builtin.file:
+    path: "{{ launch_agents_dir }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: staff
+
 - name: Apply Launch Agent for Apple Container
   ansible.builtin.template:
     src: com.apple.container.plist.j2

@@ -1,4 +1,10 @@
 ---
+- name: Ensure the LaunchAgents directory exists
+  ansible.builtin.file:
+    path: "{{ launch_agents_dir }}"
+    state: directory
+    mode: '0755'
+
 # Apps opened from the Dock, Finder or Spotlight get launchd's environment,
 # not the login shell's, so without this Android Studio's Gradle can't find
 # the keg-only Node ("A problem occurred starting process 'command 'node''").
