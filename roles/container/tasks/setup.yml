@@ -7,10 +7,14 @@
     update_homebrew: true
   register: container_install_result
 
+# Always, not just when the install changed: if an earlier run installed
+# container but failed before loading the Launch Agent, the next run would
+# otherwise skip it for good and never start the system.
 - name: Include Launch Agent tasks for Apple Container
   ansible.builtin.include_tasks: launch_agent.yml
-  when: container_install_result.changed
 
+# The Launch Agent runs `container system start` asynchronously, so give the
+# apiserver a moment to register after a fresh load or kickstart.
 - name: Check that the Container system is running
   ansible.builtin.command:
     argv:
@@ -18,6 +22,9 @@
       - system
       - status
   register: container_info
+  until: container_info.rc == 0
+  retries: 10
+  delay: 3
   changed_when: false
 
 # How's this for a double negative?

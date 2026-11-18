@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.4.3] - 2026-11-17
+
+### Fixed
+
+- `container` now applies and loads its Launch Agent on every run. It used to do this only when `brew install container` reported a change. If a run installed container and then failed before loading the agent, every later run skipped the agent and failed with `apiserver is not running and not registered with launchd`. The agent is now loaded if it isn't already, and restarted only when container was upgraded or the plist changed. The status check also retries for up to 30 seconds, since `container system start` runs in the background after a load.
+
 ## [0.4.2] - 2026-11-17
 
 ### Fixed
