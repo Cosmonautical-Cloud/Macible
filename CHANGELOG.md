@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.5.0] - 2026-11-18
+
+### Added
+
+- `php_extensions` role: builds version-pinned pecl extensions (such as `redis`, `apcu` and `imagick`) for a Homebrew PHP and enables them in its `php.ini`. Extensions already at their pinned version aren't rebuilt. Until now these were installed by hand, so a new host, like one restored from a Time Machine backup that didn't include `/opt/homebrew`, silently had none of them.
+
 ## [0.4.4] - 2026-11-17
 
 ### Fixed

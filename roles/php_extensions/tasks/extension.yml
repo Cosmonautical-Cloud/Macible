@@ -1,0 +1,84 @@
+---
+- name: Check the installed version - {{ php_extension.name }}
+  ansible.builtin.command:
+    argv:
+      - "{{ php_extensions_homebrew_prefix }}/opt/{{ php_extensions_php }}/bin/php"
+      - -r
+      - "echo phpversion('{{ php_extension.name }}') ?: '';"
+  register: php_extensions_current
+  changed_when: false
+
+- name: Replace the build - {{ php_extension.name ~ ' ' ~ php_extension.version }}
+  when: php_extensions_current.stdout != php_extension.version
+  block:
+    # pecl refuses to install over an extension php.ini already loads
+    # ("Extension 'apcu' already loaded. Please unload it in your php.ini
+    # file prior to install or upgrade"), so comment it out for the build.
+    # The enable task below puts it back.
+    - name: Disable the old build while pecl replaces it - {{ php_extension.name }}
+      ansible.builtin.lineinfile:
+        path: "{{ php_extensions_ini.stdout }}"
+        regexp: '^\s*extension\s*=\s*"?{{ php_extension.name }}(\.so)?"?\s*$'
+        line: ';extension="{{ php_extension.name }}.so"'
+        backrefs: true
+      when: php_extensions_current.stdout | length > 0
+
+    # pecl asks a few configure questions (redis asks about igbinary, lzf,
+    # zstd and so on); blank answers take each default. -f reinstalls over
+    # an older version.
+    - name: Build with pecl - {{ php_extension.name ~ ' ' ~ php_extension.version }}
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          printf '%.0s\n' {1..30} |
+          pecl install -f {{ (php_extension.name ~ '-' ~ php_extension.version) | quote }}
+        executable: /bin/bash
+      environment:
+        PATH: "{{ php_extensions_homebrew_prefix }}/opt/{{ php_extensions_php }}/bin:{{ php_extensions_homebrew_prefix }}/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        CPPFLAGS: "-I{{ php_extensions_homebrew_prefix }}/opt/pcre2/include"
+      changed_when: true
+
+  rescue:
+    # A failed build leaves the previous .so in place; load it again rather
+    # than leave PHP without the extension.
+    - name: Re-enable the previous build - {{ php_extension.name }}
+      ansible.builtin.lineinfile:
+        path: "{{ php_extensions_ini.stdout }}"
+        regexp: '^\s*;?\s*extension\s*=\s*"?{{ php_extension.name }}(\.so)?"?\s*$'
+        line: 'extension="{{ php_extension.name }}.so"'
+        insertbefore: BOF
+      when: php_extensions_current.stdout | length > 0
+
+    - name: Fail the build - {{ php_extension.name }}
+      ansible.builtin.fail:
+        msg: >-
+          pecl install {{ php_extension.name }}-{{ php_extension.version }} failed;
+          {{ php_extension.name }} {{ php_extensions_current.stdout or '(none)' }} is still loaded.
+
+# Disabling the old build leaves a commented-out line, and pecl adds its own
+# enable line rather than uncommenting it.
+- name: Remove commented-out lines - {{ php_extension.name }}
+  ansible.builtin.lineinfile:
+    path: "{{ php_extensions_ini.stdout }}"
+    regexp: '^\s*;\s*extension\s*=\s*"?{{ php_extension.name }}(\.so)?"?\s*$'
+    state: absent
+
+# pecl adds this line itself on a first install, but not if the extension was
+# already listed under another spelling or the line was removed by hand.
+- name: Enable in php.ini - {{ php_extension.name }}
+  ansible.builtin.lineinfile:
+    path: "{{ php_extensions_ini.stdout }}"
+    regexp: '^\s*;?\s*extension\s*=\s*"?{{ php_extension.name }}(\.so)?"?\s*$'
+    line: 'extension="{{ php_extension.name }}.so"'
+    insertbefore: BOF
+
+- name: Check the extension loads - {{ php_extension.name }}
+  ansible.builtin.command:
+    argv:
+      - "{{ php_extensions_homebrew_prefix }}/opt/{{ php_extensions_php }}/bin/php"
+      - -r
+      - "echo phpversion('{{ php_extension.name }}') ?: '';"
+  register: php_extensions_loaded
+  changed_when: false
+  failed_when: php_extensions_loaded.stdout != php_extension.version
+  when: not ansible_check_mode

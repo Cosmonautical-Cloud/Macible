@@ -1,0 +1,19 @@
+---
+# Homebrew formula whose PHP the extensions are built for. Installed by this
+# role if it's missing.
+php_extensions_php: php@8.4
+php_extensions_homebrew_prefix: /opt/homebrew
+
+# Homebrew formulae every pecl build needs. pcre2's headers are included by
+# PHP's own headers, but pecl doesn't add Homebrew's include path for them -
+# see CPPFLAGS in tasks/extension.yml.
+php_extensions_build_packages:
+  - autoconf
+  - pkgconf
+  - pcre2
+
+# Each entry: {name, version, brew_packages?}. brew_packages are extra
+# Homebrew formulae that extension links against (imagick needs
+# imagemagick). Merged with every php_extensions__<suffix> variable visible
+# to the host, same convention as additional_homebrew_packages.
+php_extensions: []
