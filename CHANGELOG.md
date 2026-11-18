@@ -7,6 +7,7 @@ All notable changes to this project are documented here. Format based on [Keep a
 ### Added
 
 - `php_extensions` role: builds version-pinned pecl extensions (such as `redis`, `apcu` and `imagick`) for a Homebrew PHP and enables them in its `php.ini`. Extensions already at their pinned version aren't rebuilt. Until now these were installed by hand, so a new host, like one restored from a Time Machine backup that didn't include `/opt/homebrew`, silently had none of them.
+- `directories` role: creates directories listed in the inventory (`directories`, `directories__<suffix>`), owned by the deploy user by default. It runs with `become`, so it can create a user-owned directory inside root-owned `/opt`, which Nomad, running as that user, can't. The GitHub Actions runner's `/opt/github-actions` was created by hand on each runner host; a new one (lovelace) didn't have it, and its runner failed to start with `mkdir: /opt/github-actions: Permission denied`.
 
 ## [0.4.4] - 2026-11-17
 
