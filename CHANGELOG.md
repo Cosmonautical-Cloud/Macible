@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.4.4] - 2026-11-17
+
+### Fixed
+
+- `container` checks the apiserver with `launchctl print gui/<uid>/com.apple.container.apiserver` instead of `container system status`. Since container 1.7, `container system status` looks in the launchd domain of the session that runs it. Over SSH that's the user domain, so the check failed (`apiserver is not running and not registered with launchd`) even though the apiserver was running in the GUI domain, where the Launch Agent and Nomad's container driver use it.
+
 ## [0.4.3] - 2026-11-17
 
 ### Fixed
