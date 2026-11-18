@@ -1,0 +1,6 @@
+---
+# Each entry: {path, owner?, group?, mode?}. owner defaults to ansible_user,
+# group to staff, mode to 0755. Merged with every directories__<suffix>
+# variable visible to the host, same convention as
+# additional_homebrew_packages.
+directories: []
