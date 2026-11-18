@@ -13,23 +13,34 @@
 - name: Include Launch Agent tasks for Apple Container
   ansible.builtin.include_tasks: launch_agent.yml
 
-# The Launch Agent runs `container system start` asynchronously, so give the
-# apiserver a moment to register after a fresh load or kickstart.
+# Ask launchd about the apiserver in the GUI domain, where the Launch Agent
+# (and Nomad's container driver) run it. `container system status` itself
+# can't be used: since container 1.7 it looks in the domain of whatever
+# session runs it, which over SSH is the user domain, so it reports "not
+# registered" for a healthy GUI-domain apiserver. The Launch Agent runs
+# `container system start` asynchronously, so give it a moment after a load.
 - name: Check that the Container system is running
   ansible.builtin.command:
     argv:
-      - "{{ homebrew_dir }}/bin/container"
-      - system
-      - status
+      - launchctl
+      - print
+      - "gui/{{ ansible_user_uid }}/{{ container_launchagent_label }}.apiserver"
   register: container_info
-  until: container_info.rc == 0
+  until: container_info.rc == 0 and container_info.stdout is search('(?m)^\\s+state = running$')
   retries: 10
   delay: 3
+  failed_when: false
   changed_when: false
 
-# How's this for a double negative?
 - name: Assert that Container system is running
   ansible.builtin.assert:
     that:
-      - "'not running and not registered' not in container_info.stdout"
-    fail_msg: "Container system does not appear to be running. Please check the launch agent and logs for more details."
+      - container_info.rc == 0
+      - container_info.stdout is search('(?m)^\\s+state = running$')
+    fail_msg: >-
+      The Apple Container apiserver isn't running in gui/{{ ansible_user_uid }}.
+      Check the {{ container_launchagent_label }} Launch Agent and
+      {{ log_dir }}/{{ container_launchagent_log_file }}. If `container system
+      start` was run by hand over SSH, it registered in the user domain
+      instead: run `container system stop` over SSH, then
+      `launchctl kickstart -k gui/{{ ansible_user_uid }}/{{ container_launchagent_label }}`.
