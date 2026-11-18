@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [semantic versioning](https://semver.org/).
 
+## [0.4.2] - 2026-11-17
+
+### Fixed
+
+- The `container`, `podman` and `shell_env` roles create `launch_agents_dir` before writing their LaunchAgent plist. A fresh user account has no `~/Library/LaunchAgents` yet, so the template task failed with `Destination directory /Users/<user>/Library/LaunchAgents does not exist`.
+
 ## [0.4.1] - 2026-11-17
 
 ### Fixed
