@@ -1,0 +1,33 @@
+---
+- name: Merge PHP extension lists
+  ansible.builtin.set_fact:
+    php_extensions_merged: >-
+      {{ php_extensions
+         + (query('ansible.builtin.vars', *query('ansible.builtin.varnames', '^php_extensions__.+$') | sort) | flatten) }}
+
+- name: Install PHP extensions
+  when: php_extensions_merged | length > 0
+  block:
+    - name: Install PHP and build dependencies
+      community.general.homebrew:
+        name: >-
+          {{ ([php_extensions_php] + php_extensions_build_packages
+              + (php_extensions_merged | map(attribute='brew_packages', default=[]) | flatten)) | unique }}
+        state: present
+
+    - name: Find the php.ini PHP loads
+      ansible.builtin.command:
+        argv:
+          - "{{ php_extensions_homebrew_prefix }}/opt/{{ php_extensions_php }}/bin/php"
+          - -r
+          - "echo php_ini_loaded_file();"
+      register: php_extensions_ini
+      changed_when: false
+      failed_when: php_extensions_ini.rc != 0 or not php_extensions_ini.stdout
+
+    - name: Install each extension
+      ansible.builtin.include_tasks: extension.yml
+      loop: "{{ php_extensions_merged }}"
+      loop_control:
+        loop_var: php_extension
+        label: "{{ php_extension.name }} {{ php_extension.version }}"

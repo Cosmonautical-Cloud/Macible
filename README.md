@@ -15,6 +15,7 @@ The playbook installs the toolchain [Jellify](https://github.com/Jellify-Music/A
 | [`cosmonautical.macible.release_archives`](roles/release_archives/README.md) | Installs version-pinned tools from release archives into `<dest>/<version>` with a `<dest>/current` symlink |
 | [`cosmonautical.macible.android_sdk`](roles/android_sdk/README.md) | Installs a JDK and the Android SDK command-line tools, accepts SDK licenses and installs `android_sdk_packages` |
 | [`cosmonautical.macible.xcode`](roles/xcode/README.md) | Installs Xcode from the App Store, selects it, accepts its license, runs its first-launch setup and downloads simulator runtimes |
+| [`cosmonautical.macible.php_extensions`](roles/php_extensions/README.md) | Builds version-pinned pecl extensions for a Homebrew PHP and enables them in its `php.ini` |
 | [`cosmonautical.macible.ruby`](roles/ruby/README.md) | Builds Ruby versions with rbenv and sets the rbenv global |
 | [`cosmonautical.macible.shell_env`](roles/shell_env/README.md) | Manages a block in `~/.zprofile` that puts Homebrew, Node, rbenv, the JDK and the Android SDK on the shell |
 | [`cosmonautical.macible.docker_desktop`](roles/docker_desktop/README.md) | Installs (`docker.enabled: true`) or removes (`false`) Docker Desktop |
